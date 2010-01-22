@@ -1,0 +1,11 @@
+#!/usr/bin/env ruby
+require 'irb'
+require 'swirl'
+
+def c
+  @c ||= Swirl::EC2.new
+end
+
+if $0 =~ %r|/swirl|
+  IRB.start(__FILE__)
+end
