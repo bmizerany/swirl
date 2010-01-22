@@ -61,6 +61,9 @@ module Swirl
             value.each_with_index do |val, n|
               exp["#{key}.#{n}"] = val
             end
+          when Range
+            exp["From#{key}"] = value.min
+            exp["To#{key}"] = value.max
           else
             exp[key] = value
           end

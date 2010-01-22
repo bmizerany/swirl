@@ -36,4 +36,11 @@ class ExpanderTest < Test::Unit::TestCase
     assert_equal expected, Expander.expand(request)
   end
 
+  test "converts Key of Range to FromKey ToKey" do
+    request = { "Port" => 1..3 }
+    expected = { "FromPort" => 1, "ToPort" => 3 }
+
+    assert_equal expected, Expander.expand(request)
+  end
+
 end
