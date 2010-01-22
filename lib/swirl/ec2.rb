@@ -9,66 +9,9 @@ require 'hmac-sha2'
 module Swirl
 
   class EC2
-
-    module ResponseNormalizer
-
-      def self.call(response)
-        root = response.keys.first
-        call!(response[root])
-      end
-
-      def self.call!(response)
-        response.inject({}) do |norm, (key, value)|
-          case key
-          when /Set$/
-            if value.nil?
-              norm[key] = []
-            else
-              item  = value["item"]
-
-              ## Note
-              # We can't use Array() here because the
-              # value of 'item' can be a Hash which
-              # returns a zipped Array on #to_a
-              items = item.is_a?(Array) ? item : [item]
-
-              norm[key] = items.map {|v| call!(v) }
-            end
-          when "xmlns"
-            # noop
-          else
-            next norm if value.nil?
-            norm[key] = value
-          end
-          norm
-        end
-      end
-
-    end
-
-    module RequestNormalizer
-
-      def self.call(request)
-        request.inject({}) do |norm, (key, value)|
-
-          next(norm) if key.is_a?(Symbol)
-
-          case value
-          when Array
-            value.each_with_index do |val, n|
-              norm["#{key}.#{n}"] = val
-            end
-          when Range
-            norm["From#{key}"] = value.min.to_s
-            norm["To#{key}"] = value.max.to_s
-          else
-            norm[key] = value.to_s
-          end
-          norm
-        end
-      end
-
-    end
+    include Compactor
+    include Extractor
+    include Slop
 
     def self.credentials(name=:default, file="~/.swirl")
       YAML.load_file(File.expand_path(file))[name]
@@ -101,9 +44,8 @@ module Swirl
     end
 
     def call(action, query={})
-      normalized_query = RequestNormalizer.call(query)
-      response = call!(action, normalized_query)
-      ResponseNormalizer.call(response)
+      response = call!(action, expand(query))
+      slopify(compact(response))
     end
 
     def call!(action, query={})
