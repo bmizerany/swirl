@@ -39,5 +39,4 @@ class ExpanderTest < Test::Unit::TestCase
     assert_equal expected, Expander.expand(response)
   end
 
-
 end
