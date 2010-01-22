@@ -82,6 +82,7 @@ module Swirl
     module Slop
       def self.new(response)
         sloppy = Hash.new do |hash, key|
+          response[Slop.camalize(key)]
         end
       end
 

@@ -9,4 +9,9 @@ class SlopTest < Test::Unit::TestCase
     assert_equal "fooBar", Slop.camalize(:foo_bar)
   end
 
+  test "gets sloppy" do
+    slop = Slop.new({"fooBar" => "baz"})
+    assert_equal "baz", slop[:foo_bar]
+  end
+
 end
