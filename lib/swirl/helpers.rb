@@ -31,7 +31,7 @@ module Swirl
       def compact(response)
         root_key = response.keys.first
         base = response[root_key]
-        base.inject({}) do |exp, (key, value)|
+        base.inject({}) do |com, (key, value)|
           if Lists.include?(key)
             converted = if value && value.has_key?("item")
               items = value["item"]
@@ -40,11 +40,11 @@ module Swirl
             else
               []
             end
-            exp[key] = converted
+            com[key] = converted
           else
-            exp[key] = value
+            com[key] = value
           end
-          exp
+          com
         end
       end
       module_function :compact
@@ -53,6 +53,10 @@ module Swirl
 
     module Expander
       def expand(request)
+        request.inject({}) do |exp, (key, value)|
+          exp[key] = value
+          exp
+        end
       end
       module_function :expand
     end
