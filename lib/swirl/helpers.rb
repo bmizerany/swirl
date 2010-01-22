@@ -34,6 +34,7 @@ module Swirl
         base.inject({}) do |exp, (key, value)|
           if Lists.include?(key)
             items = value["item"]
+            items ||= []
             items = items.is_a?(Array) ? items : [items]
             exp[key] = items
           else
