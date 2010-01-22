@@ -54,6 +54,7 @@ module Swirl
     module Expander
       def expand(request)
         request.inject({}) do |exp, (key, value)|
+          next(exp) if !key.is_a?(String)
           exp[key] = value
           exp
         end

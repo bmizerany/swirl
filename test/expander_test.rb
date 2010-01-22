@@ -10,4 +10,11 @@ class ExpanderTest < Test::Unit::TestCase
     assert_equal request, Expander.expand(request)
   end
 
+  test "ignores non-String keys" do
+    request = { "foo" => "bar", :ignore => "test" }
+    expected = { "foo" => "bar" }
+
+    assert_equal expected, Expander.expand(request)
+  end
+
 end
