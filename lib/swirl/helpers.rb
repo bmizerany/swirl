@@ -55,7 +55,14 @@ module Swirl
       def expand(request)
         request.inject({}) do |exp, (key, value)|
           next(exp) if !key.is_a?(String)
-          exp[key] = value
+          case value
+          when Array
+            value.each_with_index do |val, n|
+              exp["#{key}.#{n}"] = val
+            end
+          else
+            exp[key] = value
+          end
           exp
         end
       end

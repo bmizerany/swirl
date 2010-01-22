@@ -17,4 +17,16 @@ class ExpanderTest < Test::Unit::TestCase
     assert_equal expected, Expander.expand(request)
   end
 
+  test "expands Array values to .n key-values" do
+    request = { "group" => ["foo", "bar", "baz"] }
+
+    expected = {
+      "group.0" => "foo",
+      "group.1" => "bar",
+      "group.2" => "baz"
+    }
+
+    assert_equal expected, Expander.expand(request)
+  end
+
 end
