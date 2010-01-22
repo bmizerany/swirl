@@ -33,8 +33,8 @@ module Swirl
         base = request[root_key]
         base.inject({}) do |exp, (key, value)|
           if Lists.include?(key)
-            items = base[key]["item"]
-            items = !items.is_a?(Array) ? [items] : items
+            items = value["item"]
+            items = items.is_a?(Array) ? items : [items]
             exp[key] = items
           else
             exp[key] = value
@@ -43,6 +43,7 @@ module Swirl
         end
       end
       module_function :expand
+
     end
 
     module Compactor

@@ -11,8 +11,8 @@ class ExpanderTest < Test::Unit::TestCase
     assert_equal expected, Expander.expand(response)
   end
 
-  test "turns item lists into Array" do
-    response = { "Foo" => { "groupSet" => { "item" => { "foo" => "bar" } } } }
+  test "pivots list keys on item" do
+    response = { "Foo" => { "groupSet" => { "item" => [{ "foo" => "bar" }] } } }
     expected = { "groupSet" =>  [ { "foo" => "bar" } ] }
 
     assert_equal expected, Expander.expand(response)
