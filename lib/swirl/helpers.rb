@@ -2,7 +2,7 @@ module Swirl
 
   module Helpers
 
-    module Expander
+    module Compactor
 
       Lists = [
         "keySet",
@@ -28,9 +28,9 @@ module Swirl
         "addressesSet"
       ]
 
-      def expand(request)
-        root_key = request.keys.first
-        base = request[root_key]
+      def compact(response)
+        root_key = response.keys.first
+        base = response[root_key]
         base.inject({}) do |exp, (key, value)|
           if Lists.include?(key)
             converted = if value && value.has_key?("item")
@@ -47,14 +47,14 @@ module Swirl
           exp
         end
       end
-      module_function :expand
+      module_function :compact
 
     end
 
-    module Compactor
-      def compact(response)
+    module Expander
+      def expand(request)
       end
-      module_function :compact
+      module_function :expand
     end
 
   end
