@@ -33,9 +33,13 @@ module Swirl
         base = request[root_key]
         base.inject({}) do |exp, (key, value)|
           if Lists.include?(key)
-            items = value["item"]
-            items ||= []
-            items = items.is_a?(Array) ? items : [items]
+            items = if value && value.has_key?("item")
+              items = value["item"]
+              items ||= []
+              items = items.is_a?(Array) ? items : [items]
+            else
+              []
+            end
             exp[key] = items
           else
             exp[key] = value
