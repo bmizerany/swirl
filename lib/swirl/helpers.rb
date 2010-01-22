@@ -3,9 +3,44 @@ module Swirl
   module Helpers
 
     module Expander
+
+      Lists = [
+        "keySet",
+        "groupSet",
+        "blockDeviceMapping",
+        "instancesSet",
+        "reservationSet",
+        "imagesSet",
+        "ownersSet",
+        "executableBySet",
+        "securityGroupSet",
+        "ipPermissions",
+        "ipRanges",
+        "groups",
+        "securityGroupInfo",
+        "add",
+        "remove",
+        "launchPermission",
+        "productCodes",
+        "availabilityZoneSet",
+        "availabilityZoneInfo",
+        "publicIpsSet",
+        "addressesSet"
+      ]
+
       def expand(request)
         root_key = request.keys.first
-        request[root_key]
+        base = request[root_key]
+        base.inject({}) do |exp, (key, value)|
+          if Lists.include?(key)
+            items = base[key]["item"]
+            items = !items.is_a?(Array) ? [items] : items
+            exp[key] = items
+          else
+            exp[key] = value
+          end
+          exp
+        end
       end
       module_function :expand
     end
