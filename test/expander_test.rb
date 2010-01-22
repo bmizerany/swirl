@@ -29,4 +29,11 @@ class ExpanderTest < Test::Unit::TestCase
     assert_equal expected, Expander.expand(request)
   end
 
+  test "ignores empty Array values" do
+    request = { "group" => [] }
+    expected = {}
+
+    assert_equal expected, Expander.expand(request)
+  end
+
 end
