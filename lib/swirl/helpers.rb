@@ -31,12 +31,18 @@ module Swirl
       def compact(response)
         root_key = response.keys.first
         base = response[root_key]
-        base.inject({}) do |com, (key, value)|
+        compact!(base)
+      end
+      module_function :compact
+
+      def compact!(data)
+        data.inject({}) do |com, (key, value)|
           if Lists.include?(key)
             converted = if value && value.has_key?("item")
               items = value["item"]
               items ||= []
               items = items.is_a?(Array) ? items : [items]
+              items.map {|item| compact!(item) }
             else
               []
             end
@@ -47,7 +53,7 @@ module Swirl
           com
         end
       end
-      module_function :compact
+      module_function :compact!
 
     end
 

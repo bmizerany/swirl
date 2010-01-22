@@ -39,4 +39,28 @@ class CompactorTest < Test::Unit::TestCase
     assert_equal expected, Compactor.compact(response)
   end
 
+  test "traverses list values and compacts" do
+    response = {
+      "Foo" => {
+        "groupSet" => {
+          "item" => {
+            "ipPermissions" => {
+              "item" => {
+                "proto" => "tcp"
+              }
+            }
+          }
+        }
+      }
+    }
+
+    expected = {
+      "groupSet" => [
+        { "ipPermissions" => [ { "proto" => "tcp" } ] }
+      ]
+    }
+
+    assert_equal expected, Compactor.compact(response)
+  end
+
 end
