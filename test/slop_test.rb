@@ -14,4 +14,11 @@ class SlopTest < Test::Unit::TestCase
     assert_equal "baz", slop[:foo_bar]
   end
 
+  test "raise InvalidKey if key not found" do
+    slop = Slop.new({})
+    assert_raises Slop::InvalidKey do
+      slop[:not_here]
+    end
+  end
+
 end

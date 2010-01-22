@@ -80,9 +80,13 @@ module Swirl
     end
 
     module Slop
+      class InvalidKey < StandardError ; end
+
       def self.new(response)
         sloppy = Hash.new do |hash, key|
-          response[Slop.camalize(key)]
+          camalized = Slop.camalize(key)
+          raise InvalidKey, key if !response.has_key?(camalized)
+          response[camalized]
         end
       end
 
@@ -90,6 +94,10 @@ module Swirl
         head, tail = stringish.to_s.split("_")
         rest = Array(tail).map! {|part| part.capitalize }
         [head, *rest].join
+      end
+
+      def slopify(response)
+        Slop.new(response)
       end
     end
 
