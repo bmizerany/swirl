@@ -79,6 +79,19 @@ module Swirl
       module_function :expand
     end
 
+    module Slop
+      def self.new(response)
+        sloppy = Hash.new do |hash, key|
+        end
+      end
+
+      def self.camalize(stringish)
+        head, tail = stringish.to_s.split("_")
+        rest = Array(tail).map! {|part| part.capitalize }
+        [head, *rest].join
+      end
+    end
+
   end
 
 end
