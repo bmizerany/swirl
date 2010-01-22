@@ -1,17 +1,19 @@
 require 'yaml'
 require 'cgi'
 require 'base64'
+require 'net/https'
 
-require 'restclient'
 require 'crack/xml'
 require 'hmac-sha2'
+
+require 'swirl/helpers'
 
 module Swirl
 
   class EC2
-    include Compactor
-    include Extractor
-    include Slop
+    include Helpers::Compactor
+    include Helpers::Expander
+    include Helpers::Slop
 
     def self.credentials(name=:default, file="~/.swirl")
       YAML.load_file(File.expand_path(file))[name]
@@ -62,13 +64,23 @@ module Swirl
       body = compile_sorted_form_data(query)
       body += "&" + ["Signature", compile_signature(method, body)].join("=")
 
-      response = RestClient.post(
-        @url,
-        body,
-        "Content-Type" => "application/x-www-form-urlencoded"
-      )
+      response = post(body)
+      Crack::XML.parse(response.body)
+    end
 
-      Crack::XML.parse(response)
+    def post(body)
+      url = URI(@url)
+
+      headers = { "Content-Type" => "application/x-www-form-urlencoded" }
+
+      http = Net::HTTP.new(url.host, url.port)
+      http.use_ssl = true
+      http.verify_mode = OpenSSL::SSL::VERIFY_NONE
+
+      request = Net::HTTP::Post.new(url.request_uri, headers)
+      request.body = body
+
+      http.request(request)
     end
 
   end
