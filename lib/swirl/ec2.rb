@@ -42,6 +42,14 @@ module Swirl
       escape(encoded_sig)
     end
 
+    ##
+    # Execute an EC2 command, expand the input,
+    # and compact the output
+    #
+    # Examples:
+    #   ec2.call("DescribeInstances")
+    #   ec2.call("TerminateInstances", "InstanceId" => ["i-1234", "i-993j"]
+    #
     def call(action, query={})
       compact(call!(action, expand(query)))
     end
