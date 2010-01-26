@@ -63,7 +63,7 @@ module Swirl
       query["SignatureMethod"] = "HmacSHA256"
       query["SignatureVersion"] = "2"
       query["Timestamp"] = Time.now.utc.strftime("%Y-%m-%dT%H:%M:%SZ")
-      query["Version"] = "2009-11-30"
+      query["Version"] = @version
 
       body = compile_sorted_form_data(query)
       body += "&" + ["Signature", compile_signature(method, body)].join("=")
