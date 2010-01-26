@@ -11,6 +11,13 @@ class CompactorTest < Test::Unit::TestCase
     assert_equal expected, Compactor.compact(response)
   end
 
+  test "ignores xmlns" do
+    response = { "Foo" => { "requestId" => "abc123", "xmlns" => "suckit" } }
+    expected = { "requestId" => "abc123" }
+
+    assert_equal expected, Compactor.compact(response)
+  end
+
   test "pivots list keys on item" do
     response = { "Foo" => { "groupSet" => { "item" => [{ "foo" => "bar" }] } } }
     expected = { "groupSet" =>  [ { "foo" => "bar" } ] }

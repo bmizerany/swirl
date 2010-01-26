@@ -47,6 +47,8 @@ module Swirl
               []
             end
             com[key] = converted
+          elsif key == "xmlns"
+            next(com)
           else
             com[key] = value
           end

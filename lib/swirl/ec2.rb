@@ -10,9 +10,14 @@ require 'swirl/helpers'
 
 module Swirl
 
+  ## Errors
+  class InvalidRequest < StandardError ; end
+
+
   class EC2
     include Helpers::Compactor
     include Helpers::Expander
+
 
     def self.options(name=:default, file="~/.swirl")
       YAML.load_file(File.expand_path(file))[name]
@@ -54,7 +59,18 @@ module Swirl
     #   ec2.call("TerminateInstances", "InstanceId" => ["i-1234", "i-993j"]
     #
     def call(action, query={})
-      compact(call!(action, expand(query)))
+      code, data = call!(action, expand(query))
+
+      case code
+      when 200
+        compact(data)
+      when 400...500
+        messages = Array(data["Response"]["Errors"]).map {|_, e| e["Message"] }
+        raise InvalidRequest, messages.join(",")
+      else
+        msg = "unexpected response #{response.code} -> #{data.inspect}"
+        raise InvalidRequest, msg
+      end
     end
 
     def call!(action, query={})
@@ -72,7 +88,8 @@ module Swirl
       body += "&" + ["Signature", compile_signature(method, body)].join("=")
 
       response = post(body)
-      Crack::XML.parse(response.body)
+      data = Crack::XML.parse(response.body)
+      [response.code.to_i, data]
     end
 
     def post(body)
