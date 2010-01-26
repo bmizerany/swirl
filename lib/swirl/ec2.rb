@@ -15,18 +15,16 @@ module Swirl
     include Helpers::Expander
     include Helpers::Slop
 
-    def self.credentials(name=:default, file="~/.swirl")
+    def self.options(name=:default, file="~/.swirl")
       YAML.load_file(File.expand_path(file))[name]
     end
 
-    def initialize(options=self.class.credentials)
-      @aws_access_key_id      = options[:aws_access_key_id]
-      @aws_secret_access_key  = options[:aws_secret_access_key]
-      @hmac       = HMAC::SHA256.new(@aws_secret_access_key)
-      @host       = options[:host]      || 'ec2.amazonaws.com'
-      @port       = options[:port]      || 443
-      @scheme     = options[:scheme]    || 'https'
-      @url        = "#{@scheme}://#{@host}:#{@port}"
+    def initialize(options=self.class.options)
+      @aws_access_key_id = options[:aws_access_key_id]
+      @aws_secret_access_key = options[:aws_secret_access_key]
+      @hmac = HMAC::SHA256.new(@aws_secret_access_key)
+      @version = options[:version] || "2009-11-30"
+      @url = URI(options[:url] || "https://ec2.amazonaws.com")
     end
 
     def escape(value)
@@ -39,15 +37,14 @@ module Swirl
     end
 
     def compile_signature(method, body)
-      string_to_sign = [method, @host, "/", body] * "\n"
+      string_to_sign = [method, @url.host, "/", body] * "\n"
       hmac = @hmac.update(string_to_sign)
       encoded_sig = Base64.encode64(hmac.digest).chomp
       escape(encoded_sig)
     end
 
     def call(action, query={})
-      response = call!(action, expand(query))
-      slopify(compact(response))
+      compact(call!(action, expand(query)))
     end
 
     def call!(action, query={})
@@ -69,15 +66,13 @@ module Swirl
     end
 
     def post(body)
-      url = URI(@url)
-
       headers = { "Content-Type" => "application/x-www-form-urlencoded" }
 
-      http = Net::HTTP.new(url.host, url.port)
+      http = Net::HTTP.new(@url.host, @url.port)
       http.use_ssl = true
       http.verify_mode = OpenSSL::SSL::VERIFY_NONE
 
-      request = Net::HTTP::Post.new(url.request_uri, headers)
+      request = Net::HTTP::Post.new(@url.request_uri, headers)
       request.body = body
 
       http.request(request)
