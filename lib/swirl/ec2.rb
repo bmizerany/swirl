@@ -18,7 +18,10 @@ module Swirl
       YAML.load_file(File.expand_path(file))[name]
     end
 
-    def initialize(options=self.class.options)
+    def initialize(options={}, file="~/.swirl")
+      account = options.fetch(:account) { :default }
+      options = self.class.options(account, file).merge(options)
+
       @aws_access_key_id = options[:aws_access_key_id]
       @aws_secret_access_key = options[:aws_secret_access_key]
       @hmac = HMAC::SHA256.new(@aws_secret_access_key)
@@ -83,6 +86,10 @@ module Swirl
       request.body = body
 
       http.request(request)
+    end
+
+    def inspect
+      "<#{self.class.name} version: #{@version} url: #{@url} aws_access_key_id: #{@aws_access_key_id}>"
     end
 
   end
