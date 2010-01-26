@@ -13,7 +13,6 @@ module Swirl
   class EC2
     include Helpers::Compactor
     include Helpers::Expander
-    include Helpers::Slop
 
     def self.options(name=:default, file="~/.swirl")
       YAML.load_file(File.expand_path(file))[name]
