@@ -61,7 +61,7 @@ To run the entire test suite
     % gem bundle
     % bin/rake test
 
-To run the a focused test
+To run a single test
 
     % gem exec ruby test/compactor_test.rb
 
