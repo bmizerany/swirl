@@ -54,3 +54,14 @@ Use
     # Describe specific instances
     ec2.call "DescribeInstances", "InstanceId" => ["i-38hdk2f", "i-93nndch"]
 
+Test
+----
+To run the entire test suite
+
+    % gem bundle
+    % bin/rake test
+
+To run the a focused test
+
+    % gem exec ruby test/compactor_test.rb
+

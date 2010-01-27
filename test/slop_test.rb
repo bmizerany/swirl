@@ -1,5 +1,4 @@
-require 'contest'
-require 'swirl/helpers'
+require File.expand_path(File.join(File.dirname(__FILE__), 'test_helper'))
 
 class SlopTest < Test::Unit::TestCase
   include Swirl::Helpers
