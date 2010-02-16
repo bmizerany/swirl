@@ -54,3 +54,14 @@ Use
     # Describe specific instances
     ec2.call "DescribeInstances", "InstanceId" => ["i-38hdk2f", "i-93nndch"]
 
+
+Shell
+---
+
+    $ swirl
+    >> c
+    <Swirl::EC2 ... >
+    >> c.call "DescribeInstances"
+    ...
+
+The shell respects your ~/.swirl file for configuration
