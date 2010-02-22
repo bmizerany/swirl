@@ -29,6 +29,18 @@ class ExpanderTest < Test::Unit::TestCase
     assert_equal expected, Expander.expand(request)
   end
 
+  test "expands keys with # and Array values to .n. key-values" do
+    request = { "foo.#.bar" => ["foo", "bar", "baz"] }
+
+    expected = {
+      "foo.0.bar" => "foo",
+      "foo.1.bar" => "bar",
+      "foo.2.bar" => "baz"
+    }
+
+    assert_equal expected, Expander.expand(request)
+  end
+
   test "ignores empty Array values" do
     request = { "group" => [] }
     expected = {}

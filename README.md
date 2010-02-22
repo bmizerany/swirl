@@ -18,6 +18,14 @@ is `expand`ed to:
 
     { "InstanceId.0" => "i-123k2h1", "InstanceId.1" => "i-0234d3" }
 
+in the case that `.n` isn't at the end of the key:
+
+    { "Foo.#.Bar" => ["a", "b"] }
+
+is `expand`ed to:
+
+    { "Foo.0.Bar" => "a", "Foo.1.Bar" => "b" }
+
 and
 
     # Output

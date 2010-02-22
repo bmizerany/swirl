@@ -66,8 +66,9 @@ module Swirl
 
           case value
           when Array
+            key = "#{key}.#" if key !~ /#/
             value.each_with_index do |val, n|
-              exp["#{key}.#{n}"] = val
+              exp[key.gsub("#", n.to_s)] = val
             end
           when Range
             exp["From#{key}"] = value.min
