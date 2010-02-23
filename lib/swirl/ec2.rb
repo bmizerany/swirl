@@ -88,6 +88,11 @@ module Swirl
       body += "&" + ["Signature", compile_signature(method, body)].join("=")
 
       response = post(body)
+
+      if ENV["SWIRL_LOG"]
+        puts response.body
+      end
+
       data = Crack::XML.parse(response.body)
       [response.code.to_i, data]
     end
