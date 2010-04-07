@@ -20,7 +20,9 @@ module Swirl
 
 
     def self.options(name=:default, file="~/.swirl")
-      YAML.load_file(File.expand_path(file))[name]
+      file = File.expand_path(file)
+      return {} if !File.exists?(file)
+      YAML.load_file(file)[name]
     end
 
     def initialize(options={}, file="~/.swirl")
