@@ -21,13 +21,22 @@ module Swirl
 
     def self.options(name=:default, file="~/.swirl")
       file = File.expand_path(file)
-      return {} if !File.exists?(file)
-      YAML.load_file(file)[name]
+      config = YAML.load_file(file)
+      fail "Undefined account '#{name.inspect}'" if !config.has_key?(name)
+      config[name]
     end
 
     def initialize(options={}, file="~/.swirl")
-      account = options.fetch(:account) { :default }
-      options = self.class.options(account, file).merge(options)
+
+      if !File.exists?(file)
+        account = options[:account] || :default
+        options = self.class.options(account, file).merge(options)
+      elsif ENV["AWS_ACCESS_KEY_ID"] && ENV["AWS_SECRET_ACCESS_KEY"]
+        options[:aws_access_key_id]     = ENV["AWS_ACCESS_KEY_ID"]
+        options[:aws_secret_access_key] = ENV["AWS_SECRET_ACCESS_KEY"]
+      else
+        fail "Credentials not set!  See Swirl's README"
+      end
 
       @aws_access_key_id = options[:aws_access_key_id]
       @aws_secret_access_key = options[:aws_secret_access_key]
