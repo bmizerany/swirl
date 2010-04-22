@@ -1,11 +1,29 @@
 #!/usr/bin/env ruby
 require 'irb'
+require 'yaml'
 require 'swirl'
 
-def c
-  @c ||= Swirl::EC2.new
+def options(account)
+  config = File.expand_path("~/.swirl")
+  if account && File.exists?(config)
+    account = account.to_sym
+    data = YAML.load_file(config)
+    if data.key?(account)
+      data[account]
+    else
+      abort("I don't see the account you're looking for")
+    end
+  else
+    {
+      :aws_access_key_id => ENV["AWS_ACCESS_KEY_ID"],
+      :aws_secret_access_key => ENV["AWS_SECRET_ACCESS_KEY"]
+    }
+  end
 end
 
-if $0 =~ %r|/swirl|
-  IRB.start(__FILE__)
-end
+C = Swirl::EC2.new options(ARGV.shift) \
+  rescue abort("unable to find keys")
+
+def c ; C ; end
+
+IRB.start
