@@ -19,27 +19,14 @@ module Swirl
     include Helpers::Expander
 
 
-    def self.options(name=:default, file="~/.swirl")
-      file = File.expand_path(file)
-      config = YAML.load_file(file)
-      fail "Undefined account '#{name.inspect}'" if !config.has_key?(name)
-      config[name]
-    end
+    def initialize(options)
+      @aws_access_key_id =
+        options[:aws_access_key_id] ||
+        raise ArgumentError, "no aws_access_key_id provided"
+      @aws_secret_access_key =
+        options[:aws_secret_access_key] ||
+        raise ArgumentError, "no aws_secret_access_key provided"
 
-    def initialize(options={}, file="~/.swirl")
-
-      if !File.exists?(file)
-        account = options[:account] || :default
-        options = self.class.options(account, file).merge(options)
-      elsif ENV["AWS_ACCESS_KEY_ID"] && ENV["AWS_SECRET_ACCESS_KEY"]
-        options[:aws_access_key_id]     = ENV["AWS_ACCESS_KEY_ID"]
-        options[:aws_secret_access_key] = ENV["AWS_SECRET_ACCESS_KEY"]
-      else
-        fail "Credentials not set!  See Swirl's README"
-      end
-
-      @aws_access_key_id = options[:aws_access_key_id]
-      @aws_secret_access_key = options[:aws_secret_access_key]
       @hmac = HMAC::SHA256.new(@aws_secret_access_key)
       @version = options[:version] || "2009-11-30"
       @url = URI(options[:url] || "https://ec2.amazonaws.com")
