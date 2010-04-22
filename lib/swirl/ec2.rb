@@ -22,10 +22,10 @@ module Swirl
     def initialize(options)
       @aws_access_key_id =
         options[:aws_access_key_id] ||
-        raise ArgumentError, "no aws_access_key_id provided"
+        (raise ArgumentError, "no aws_access_key_id provided")
       @aws_secret_access_key =
         options[:aws_secret_access_key] ||
-        raise ArgumentError, "no aws_secret_access_key provided"
+        (raise ArgumentError, "no aws_secret_access_key provided")
 
       @hmac = HMAC::SHA256.new(@aws_secret_access_key)
       @version = options[:version] || "2009-11-30"
