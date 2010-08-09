@@ -66,7 +66,7 @@ module Swirl
         messages = Array(data["Response"]["Errors"]).map {|_, e| e["Message"] }
         raise InvalidRequest, messages.join(",")
       else
-        msg = "unexpected response #{response.code} -> #{data.inspect}"
+        msg = "unexpected response #{code} -> #{data.inspect}"
         raise InvalidRequest, msg
       end
     end
