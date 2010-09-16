@@ -2,28 +2,66 @@
 require 'irb'
 require 'yaml'
 require 'swirl'
+require 'optparse'
 
-def options(account)
-  config = File.expand_path("~/.swirl")
-  if account && File.exists?(config)
-    account = account.to_sym
-    data = YAML.load_file(config)
-    if data.key?(account)
-      data[account]
-    else
-      abort("I don't see the account you're looking for")
-    end
+interactive = false
+account = "default"
+etc = "#{ENV["HOME"]}/.swirl"
+
+ARGV.options do |o|
+  o.on("-a ACCOUT", "Account name (default is default)") {|s| account = s }
+  o.on("-c FILE", "Swirl file (default is ~/.swirl)") {|s| etc = s }
+  o.on("-i", "Interactive console") { interactive = true }
+  o.on("-h", "--help") { puts o; exit }
+  o.parse!
+end
+
+config = \
+if ENV["AWS_ACCESS_KEY_ID"] && ENV["AWS_SECRET_ACCESS_KEY"]
+  {
+    :aws_access_key_id => ENV["AWS_ACCESS_KEY_ID"],
+    :aws_secret_access_key => ENV["AWS_SECRET_ACCESS_KEY"]
+  }
+else
+  account = account.to_sym
+  data = YAML.load_file(etc)
+  if data.key?(account)
+    data[account]
   else
-    {
-      :aws_access_key_id => ENV["AWS_ACCESS_KEY_ID"],
-      :aws_secret_access_key => ENV["AWS_SECRET_ACCESS_KEY"]
-    }
+    abort("I don't see the account you're looking for")
   end
 end
 
-C = Swirl::EC2.new options(ARGV.shift) \
-  rescue abort("unable to find keys")
+c = Swirl::EC2.new config
 
-def c ; C ; end
+# We can now start the interactive session
+# if requested
+if interactive
+  # Create sugar for working in the console.
+  # >> c.call "DescribeInstances", ...
+  Kernel.send(:define_method, :c) { c }
 
-IRB.start
+  # Start the interactive session
+  IRB.start
+else
+  begin
+    case cmd = ARGV[0] || "list"
+    when "list"
+      resvs = c.call("DescribeInstances")["reservationSet"]
+      insts = resvs.map {|r| r["instancesSet"] }.flatten
+      insts.each do |ins|
+        data = [
+            ins["instanceState"]["name"],
+            ins["instanceId"],
+            ins["availabilityZone"],
+            ins["dnsName"],
+            ins["privateDnsName"],
+            ins["launchTime"]
+        ]
+        puts data * "\t"
+      end
+    end
+  rescue => e
+    $stderr.puts "! " + e.to_s
+  end
+end
