@@ -56,22 +56,28 @@ module Swirl
     #   ec2.call("DescribeInstances")
     #   ec2.call("TerminateInstances", "InstanceId" => ["i-1234", "i-993j"]
     #
-    def call(action, query={})
-      code, data = call!(action, expand(query))
+    def call(action, query={}, &blk)
+      call!(action, expand(query)) do |code, data|
+        case code
+        when 200
+          response = compact(data)
+        when 400...500
+          messages = Array(data["Response"]["Errors"]).map {|_, e| e["Message"] }
+          raise InvalidRequest, messages.join(",")
+        else
+          msg = "unexpected response #{code} -> #{data.inspect}"
+          raise InvalidRequest, msg
+        end
 
-      case code
-      when 200
-        compact(data)
-      when 400...500
-        messages = Array(data["Response"]["Errors"]).map {|_, e| e["Message"] }
-        raise InvalidRequest, messages.join(",")
-      else
-        msg = "unexpected response #{code} -> #{data.inspect}"
-        raise InvalidRequest, msg
+        if blk
+          blk.call(response)
+        else
+          response
+        end
       end
     end
 
-    def call!(action, query={})
+    def call!(action, query={}, &blk)
       # Hard coding this here until otherwise needed
       method = "POST"
 
@@ -85,17 +91,17 @@ module Swirl
       body = compile_sorted_form_data(query)
       body += "&" + ["Signature", compile_signature(method, body)].join("=")
 
-      response = post(body)
+      post(body) do |code, xml|
+        if ENV["SWIRL_LOG"]
+          puts response.body
+        end
 
-      if ENV["SWIRL_LOG"]
-        puts response.body
+        data = Crack::XML.parse(xml)
+        blk.call([code, data])
       end
-
-      data = Crack::XML.parse(response.body)
-      [response.code.to_i, data]
     end
 
-    def post(body)
+    def post(body, &blk)
       headers = { "Content-Type" => "application/x-www-form-urlencoded" }
 
       http = Net::HTTP.new(@url.host, @url.port)
@@ -105,7 +111,8 @@ module Swirl
       request = Net::HTTP::Post.new(@url.request_uri, headers)
       request.body = body
 
-      http.request(request)
+      response = http.request(request)
+      blk.call(response.code.to_i, response.body)
     end
 
     def inspect
