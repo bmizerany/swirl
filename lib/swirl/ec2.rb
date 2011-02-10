@@ -97,7 +97,7 @@ module Swirl
         end
 
         data = Crack::XML.parse(xml)
-        blk.call([code, data])
+        blk.call(code, data)
       end
     end
 

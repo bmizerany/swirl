@@ -10,12 +10,18 @@ module Swirl
       req  = http.post(:head => headers, :body => body)
 
       req.callback do
-        blk.call(req.response_header.status, req.response)
+        begin
+          blk.call(req.response_header.status, req.response)
+        rescue => e
+          req.fail(e)
+        end
       end
 
-      req.errback do
-        raise "Invalid HTTP Request: #{@url}\n"+req.response
+      def req.error(&blk)
+        errback(&blk)
       end
+
+      req
     end
   end
 end
