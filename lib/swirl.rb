@@ -1,1 +1,2 @@
-require 'swirl/ec2'
+require 'swirl/service'
+require 'swirl/service_definitions'

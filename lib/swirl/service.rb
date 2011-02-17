@@ -13,8 +13,7 @@ module Swirl
   ## Errors
   class InvalidRequest < StandardError ; end
 
-
-  class EC2
+  class Service
     include Helpers::Compactor
     include Helpers::Expander
 
@@ -28,8 +27,8 @@ module Swirl
         (raise ArgumentError, "no aws_secret_access_key provided")
 
       @hmac = HMAC::SHA256.new(@aws_secret_access_key)
-      @version = options[:version] || "2009-11-30"
-      @url = URI(options[:url] || "https://ec2.amazonaws.com")
+      @version ||= options[:version]
+      @url ||= URI(options[:url])
     end
 
     def escape(value)
@@ -62,6 +61,8 @@ module Swirl
         when 200
           response = compact(data)
         when 400...500
+          puts data.inspect
+          data = data["ErrorResponse"] if data["ErrorResponse"] # work around an ec2 API inconsistency
           messages = Array(data["Response"]["Errors"]).map {|_, e| e["Message"] }
           raise InvalidRequest, messages.join(",")
         else

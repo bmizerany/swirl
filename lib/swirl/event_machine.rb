@@ -1,8 +1,7 @@
-require 'swirl/ec2'
 require 'em-http'
 
 module Swirl
-  class EC2
+  class Base
     def post(body, &blk)
       headers = { "Content-Type" => "application/x-www-form-urlencoded" }
 
