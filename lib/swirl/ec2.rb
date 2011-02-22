@@ -1,4 +1,3 @@
-require 'yaml'
 require 'cgi'
 require 'base64'
 require 'net/https'
