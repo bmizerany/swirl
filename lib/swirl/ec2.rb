@@ -7,28 +7,68 @@ require 'hmac-sha2'
 
 require 'swirl/helpers'
 
+
 module Swirl
 
   ## Errors
   class InvalidRequest < StandardError ; end
 
 
+  # Compat
   class EC2
+    def self.new(options)
+      $stderr.puts "WARNING: Swirl::EC2 will be deprecated.  Use Swirl::AWS.new(:ec2) instead"
+      return AWS.new(:ec2, options)
+    end
+  end
+
+
+  class AWS
     include Helpers::Compactor
     include Helpers::Expander
 
+    @services = {}
 
-    def initialize(options)
-      @aws_access_key_id =
-        options[:aws_access_key_id] ||
-        (raise ArgumentError, "no aws_access_key_id provided")
-      @aws_secret_access_key =
-        options[:aws_secret_access_key] ||
-        (raise ArgumentError, "no aws_secret_access_key provided")
+    def self.services
+      # This must be modified using `service`
+      @services.dup
+    end
+
+    def self.service(name, url, version)
+      @services[name] = { :url => url, :version => version }
+    end
+
+    # Default Services
+    service :ec2, "https://ec2.amazonaws.com", "2010-11-15"
+
+
+    def initialize(*args)
+      opts = args.last.is_a?(Hash) ? args.pop : Hash.new
+      name = args.shift
+
+      service = self.class.services[name] || {}
+      opts    = service.merge(opts)
+
+      @url = opts[:url] ||
+        raise(ArgumentError, "No url given")
+
+      # Convert this here for future reference
+      @url = URI(@url)
+
+      @version = opts[:version] ||
+        raise(ArgumentError, "No version given")
+
+      @aws_access_key_id  = \
+        ENV["AWS_ACCESS_KEY_ID"] ||
+        opts[:aws_access_key_id] ||
+        raise(ArgumentError, "No aws_access_key_id given")
+
+      @aws_secret_access_key = \
+        ENV["AWS_SECRET_ACCESS_KEY"] ||
+        opts[:aws_secret_access_key] ||
+        raise(ArgumentError, "No aws_secret_access_key given")
 
       @hmac = HMAC::SHA256.new(@aws_secret_access_key)
-      @version = options[:version] || "2009-11-30"
-      @url = URI(options[:url] || "https://ec2.amazonaws.com")
     end
 
     def escape(value)
