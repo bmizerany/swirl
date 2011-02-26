@@ -7,10 +7,12 @@ require 'optparse'
 interactive = false
 account = "default"
 etc = "#{ENV["HOME"]}/.swirl"
+region = 'us-east-1'
 
 ARGV.options do |o|
   o.on("-a ACCOUT", "Account name (default is default)") {|s| account = s }
   o.on("-c FILE", "Swirl file (default is ~/.swirl)") {|s| etc = s }
+  o.on("-r REGION", "Region (default is us-east-1)") {|s| region = s}
   o.on("-i", "Interactive console") { interactive = true }
   o.on("-h", "--help") { puts o; exit }
   o.parse!
@@ -31,8 +33,9 @@ else
     abort("I don't see the account you're looking for")
   end
 end
+config[:region] = region
 
-c = Swirl::EC2.new config
+c = Swirl::AWS.new(:ec2, config)
 
 # We can now start the interactive session
 # if requested

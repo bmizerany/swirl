@@ -22,7 +22,29 @@ module Swirl
     end
   end
 
-
+  class Service
+    class Ec2
+      attr_reader :version, :region
+    
+      def initialize _region
+        @version = '2010-11-15'
+        @region = _region || 'us-east-1'
+      end
+    
+      def url
+        if region == 'us-east-1'
+          'https://ec2.amazonaws.com'
+        else
+          'https://ec2.' + region + '.amazonaws.com'
+        end
+      end
+    
+      def to_hash
+        { :version => version, :url => url }
+      end
+    end
+  end
+    
   class AWS
     include Helpers::Compactor
     include Helpers::Expander
@@ -34,20 +56,20 @@ module Swirl
       @services.dup
     end
 
-    def self.service(name, url, version)
-      @services[name] = { :url => url, :version => version }
+    def self.service(name, klass)
+      @services[name] = klass
     end
 
     # Default Services
-    service :ec2, "https://ec2.amazonaws.com", "2010-11-15"
-
+    service :ec2, Service::Ec2
 
     def initialize(*args)
       opts = args.last.is_a?(Hash) ? args.pop : Hash.new
       name = args.shift
+      region = opts.delete(:region)
 
       service = self.class.services[name] || {}
-      opts    = service.merge(opts)
+      opts    = service.new(region).to_hash.merge(opts)
 
       @url = opts[:url] ||
         raise(ArgumentError, "No url given")
