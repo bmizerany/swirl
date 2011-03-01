@@ -54,6 +54,9 @@ nifty trick we use in (Rack)[http://github.com/rack/rack]
 Use
 ---
 
+    require 'rubygems' # if you're using rubygems
+    require 'swirl/aws'
+
     ec2 = Swirl::EC2.new
 
     # Describe all instances

@@ -3,8 +3,8 @@ Gem::Specification.new do |s|
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
 
   s.name = 'swirl'
-  s.version = '1.6.2'
-  s.date = '2011-02-22'
+  s.version = '1.7.0'
+  s.date = '2011-02-28'
 
   s.description = "A version agnostic EC2 ruby driver"
   s.summary     = s.description
@@ -12,7 +12,7 @@ Gem::Specification.new do |s|
   s.authors = ["Blake Mizerany"]
 
   # = MANIFEST =
-  s.files = %w[LICENSE README.md list-types] +
+  s.files = %w[LICENSE README.md] +
     Dir["{lib,test}/**/*.rb"] +
     ["bin/swirl"]
 
