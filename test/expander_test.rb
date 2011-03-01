@@ -21,9 +21,9 @@ class ExpanderTest < Test::Unit::TestCase
     request = { "group" => ["foo", "bar", "baz"] }
 
     expected = {
-      "group.0" => "foo",
-      "group.1" => "bar",
-      "group.2" => "baz"
+      "group.1" => "foo",
+      "group.2" => "bar",
+      "group.3" => "baz"
     }
 
     assert_equal expected, Expander.expand(request)
@@ -33,9 +33,9 @@ class ExpanderTest < Test::Unit::TestCase
     request = { "foo.#.bar" => ["foo", "bar", "baz"] }
 
     expected = {
-      "foo.0.bar" => "foo",
-      "foo.1.bar" => "bar",
-      "foo.2.bar" => "baz"
+      "foo.1.bar" => "foo",
+      "foo.2.bar" => "bar",
+      "foo.3.bar" => "baz"
     }
 
     assert_equal expected, Expander.expand(request)

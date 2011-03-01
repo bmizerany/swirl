@@ -44,7 +44,8 @@ module Swirl
           when Array
             key = "#{key}.#" if key !~ /#/
             value.each_with_index do |val, n|
-              exp[key.gsub("#", n.to_s)] = val
+              # We must use n+1 because some api's do not allow a 0 index
+              exp[key.gsub("#", (n+1).to_s)] = val
             end
           when Range
             exp["From#{key}"] = value.min
