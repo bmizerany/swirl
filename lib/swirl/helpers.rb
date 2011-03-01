@@ -4,30 +4,6 @@ module Swirl
 
     module Compactor
 
-      Lists = [
-        "keySet",
-        "groupSet",
-        "blockDeviceMapping",
-        "instancesSet",
-        "reservationSet",
-        "imagesSet",
-        "ownersSet",
-        "executableBySet",
-        "securityGroupSet",
-        "ipPermissions",
-        "ipRanges",
-        "groups",
-        "securityGroupInfo",
-        "add",
-        "remove",
-        "launchPermission",
-        "productCodes",
-        "availabilityZoneSet",
-        "availabilityZoneInfo",
-        "publicIpsSet",
-        "addressesSet"
-      ]
-
       def compact(response)
         root_key = response.keys.first
         base = response[root_key]
