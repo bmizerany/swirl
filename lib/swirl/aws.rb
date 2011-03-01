@@ -31,7 +31,8 @@ module Swirl
 
     # Default Services (Region not included)
     service :ec2, "https://ec2.amazonaws.com", "2010-11-15"
-
+    service :elb, "https://elasticloadbalancing.amazonaws.com", "2010-07-01"
+    service :iam, "https://iam.amazonaws.com", "2010-05-08"
 
 
     def initialize(*args)
