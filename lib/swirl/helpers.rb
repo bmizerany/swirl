@@ -5,30 +5,35 @@ module Swirl
     module Compactor
 
       def compact(response)
-        root_key = response.keys.first
-        base = response[root_key]
-        compact!(base)
+        compact!(response.shift.last)
       end
       module_function :compact
 
-      def compact!(data)
-        data.inject({}) do |com, (key, value)|
-          if value.is_a?(Hash)
-            converted = if value.has_key?("item") || value.has_key?("member")
-              items = value["item"] || value ["member"]
-              items ||= []
-              items = items.is_a?(Array) ? items : [items]
-              items.map {|item| compact!(item) }
-            else
+      def compact!(value)
+        case value 
+        when Hash
+          # We don't need to stink'n xmlns!
+          value.delete("xmlns")
+
+          if value.has_key?("member") || value.has_key?("item")
+            value = value["member"] || value["item"]
+
+            if value == nil
               []
+            else
+              value = compact!(value)
+              # Can't use Array() here. :(
+              value.is_a?(Array) ? value : [value]
             end
-            com[key] = converted
-          elsif key == "xmlns"
-            next(com)
           else
-            com[key] = value
+            value.inject({}) do |m, (k, v)|
+              m[k] = compact!(v) ; m
+            end
           end
-          com
+        when Array
+          value.map {|v| compact!(v) }
+        else
+          value
         end
       end
       module_function :compact!
