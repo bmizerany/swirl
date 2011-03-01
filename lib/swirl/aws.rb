@@ -97,7 +97,11 @@ module Swirl
         when 200
           response = compact(data)
         when 400...500
-          messages = Array(data["Response"]["Errors"]).map {|_, e| e["Message"] }
+          messages = if data["Response"]
+            Array(data["Response"]["Errors"]).map {|_, e| e["Message"] }
+          elsif data["ErrorResponse"]
+            Array(data["ErrorResponse"]["Error"]["Code"])
+          end
           raise InvalidRequest, messages.join(",")
         else
           msg = "unexpected response #{code} -> #{data.inspect}"
