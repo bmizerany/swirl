@@ -50,13 +50,13 @@ module Swirl
         raise(ArgumentError, "No version given")
 
       @aws_access_key_id  = \
-        ENV["AWS_ACCESS_KEY_ID"] ||
         opts[:aws_access_key_id] ||
+        ENV["AWS_ACCESS_KEY_ID"] ||
         raise(ArgumentError, "No aws_access_key_id given")
 
       @aws_secret_access_key = \
-        ENV["AWS_SECRET_ACCESS_KEY"] ||
         opts[:aws_secret_access_key] ||
+        ENV["AWS_SECRET_ACCESS_KEY"] ||
         raise(ArgumentError, "No aws_secret_access_key given")
 
       @hmac = HMAC::SHA256.new(@aws_secret_access_key)
