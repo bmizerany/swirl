@@ -48,12 +48,14 @@ class CompactorTest < Test::Unit::TestCase
 
   test "traverses list values and compacts" do
     response = {
-      "Foo" => {
-        "groupSet" => {
-          "item" => {
-            "ipPermissions" => {
-              "item" => {
-                "proto" => "tcp"
+      "Bar" => {
+        "Foo" => {
+          "groupSet" => {
+            "item" => {
+              "ipPermissions" => {
+                "item" => {
+                  "proto" => "tcp"
+                }
               }
             }
           }
@@ -62,9 +64,11 @@ class CompactorTest < Test::Unit::TestCase
     }
 
     expected = {
-      "groupSet" => [
-        { "ipPermissions" => [ { "proto" => "tcp" } ] }
-      ]
+      "Foo" => {
+        "groupSet" => [
+          { "ipPermissions" => [ { "proto" => "tcp" } ] }
+        ]
+      }
     }
 
     assert_equal expected, Compactor.compact(response)
