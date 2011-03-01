@@ -3,7 +3,7 @@ Gem::Specification.new do |s|
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
 
   s.name = 'swirl'
-  s.version = '1.7.1'
+  s.version = '1.7.2'
   s.date = '2011-02-28'
 
   s.description = "A version agnostic EC2 ruby driver"
