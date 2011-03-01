@@ -25,6 +25,13 @@ class CompactorTest < Test::Unit::TestCase
     assert_equal expected, Compactor.compact(response)
   end
 
+  test "pivots list keys on member" do
+    response = { "Foo" => { "groupSet" => { "member" => [{ "foo" => "bar" }] } } }
+    expected = { "groupSet" =>  [ { "foo" => "bar" } ] }
+
+    assert_equal expected, Compactor.compact(response)
+  end
+
   test "pivots list keys item and converts to Array not already an Array" do
     response = { "Foo" => { "groupSet" => { "item" => { "foo" => "bar" } } } }
     expected = { "groupSet" =>  [ { "foo" => "bar" } ] }
