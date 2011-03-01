@@ -37,8 +37,8 @@ module Swirl
 
       def compact!(data)
         data.inject({}) do |com, (key, value)|
-          if Lists.include?(key)
-            converted = if value && value.has_key?("item")
+          if value.is_a?(Hash)
+            converted = if value.has_key?("item")
               items = value["item"]
               items ||= []
               items = items.is_a?(Array) ? items : [items]

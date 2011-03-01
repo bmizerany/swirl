@@ -39,13 +39,6 @@ class CompactorTest < Test::Unit::TestCase
     assert_equal expected, Compactor.compact(response)
   end
 
-  test "makes value empty Array if nil" do
-    response = { "Foo" => { "groupSet" => nil } }
-    expected = { "groupSet" =>  [] }
-
-    assert_equal expected, Compactor.compact(response)
-  end
-
   test "traverses list values and compacts" do
     response = {
       "Foo" => {
