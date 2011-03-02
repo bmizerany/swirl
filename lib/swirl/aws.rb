@@ -108,6 +108,9 @@ module Swirl
     end
 
     def call!(action, query={}, &blk)
+      log "Action: #{action}"
+      log "Query:  #{query.inspect}"
+
       # Hard coding this here until otherwise needed
       method = "POST"
 
@@ -122,9 +125,8 @@ module Swirl
       body += "&" + ["Signature", compile_signature(method, body)].join("=")
 
       post(body) do |code, xml|
-        if ENV["SWIRL_LOG"]
-          puts response.body
-        end
+        log "HTTP Response Code: #{code}"
+        log xml.gsub("\n", "\n[swirl] ")
 
         data = Crack::XML.parse(xml)
         blk.call(code, data)
@@ -147,6 +149,12 @@ module Swirl
 
     def inspect
       "<#{self.class.name} version: #{@version} url: #{@url} aws_access_key_id: #{@aws_access_key_id}>"
+    end
+
+    def log(msg)
+      if ENV["SWIRL_LOG"]
+        $stderr.puts "[swirl] #{msg}"
+      end
     end
 
   end
