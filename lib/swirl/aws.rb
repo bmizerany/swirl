@@ -29,8 +29,9 @@ module Swirl
       @services[name] = { :url => url, :version => version }
     end
 
-    # Default Services
+    # Default Services (Region not included)
     service :ec2, "https://ec2.amazonaws.com", "2010-11-15"
+
 
 
     def initialize(*args)
@@ -40,11 +41,14 @@ module Swirl
       service = self.class.services[name] || {}
       opts    = service.merge(opts)
 
-      @url = opts[:url] ||
+      @url = URI(opts[:url]) ||
         raise(ArgumentError, "No url given")
 
-      # Convert this here for future reference
-      @url = URI(@url)
+      if region = opts[:region]
+        parts = URI.split(@url.to_s)
+        parts[2] = parts[2].split('.').insert(1, region).join('.')
+        @url = URI::HTTPS.new(*parts)
+      end
 
       @version = opts[:version] ||
         raise(ArgumentError, "No version given")
@@ -61,6 +65,7 @@ module Swirl
 
       @hmac = HMAC::SHA256.new(@aws_secret_access_key)
     end
+
 
     def escape(value)
       CGI.escape(value).gsub(/\+/, "%20")
