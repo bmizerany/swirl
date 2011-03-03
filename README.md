@@ -68,6 +68,14 @@ Use
 
 Shell
 ---
+    $ swirl -h
+    Usage: swirl [options]
+        -a ACCOUT                        Account name (default is default)
+        -c FILE                          Swirl file (default is ~/.swirl)
+        -s service                       The AWS service to use (default is ec2)
+        -r region                        The AWS region to use (default is up to AWS)
+        -h, --help
+
 
     $ swirl
     >> c
