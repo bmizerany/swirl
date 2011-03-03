@@ -7,11 +7,13 @@ require 'optparse'
 account = "default"
 etc = "#{ENV["HOME"]}/.swirl"
 service = :ec2
+region = nil
 
 ARGV.options do |o|
   o.on("-a ACCOUT", "Account name (default is default)") {|s| account = s }
   o.on("-c FILE", "Swirl file (default is ~/.swirl)") {|s| etc = s }
   o.on("-s service", "The AWS service to use (default is ec2)") {|s| service = s }
+  o.on("-r region", "The AWS region to use (default is up to AWS)") {|s| region = s }
   o.on("-h", "--help") { puts o; exit }
   o.parse!
 end
@@ -26,7 +28,7 @@ config = (
   end
 )
 
-c = Swirl::AWS.new service.to_sym, config
+c = Swirl::AWS.new service.to_sym, config.merge(:region => region)
 
 # Create sugar for working in the console.
 # >> c.call "DescribeInstances", ...
