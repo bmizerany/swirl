@@ -1,13 +1,12 @@
 Swirl
 =====
 
-Swirl is an EC2 version agnostic client for EC2 writtin in Ruby. It gets
+Swirl is an EC2 version agnostic client for EC2 written in Ruby. It gets
 out of your way.
 
 The secret is it's simple input extraction and output compacting.  Your
 input parameters and `expand`ed and EC2's (terrible) xml output is
 `compact`ed.
-
 
 Some simple examples:
 
@@ -37,7 +36,7 @@ and
       }
     }
 
-and it's varations are now `compact`ed to:
+and it's variations are now `compact`ed to:
 
   {
     "reservationSet" => {
@@ -46,18 +45,17 @@ and it's varations are now `compact`ed to:
   }
 
 
-Some things worth noteing is that compact ignores Symbols.  This
+Some things worth noting is that compact ignores Symbols.  This
 allows you to pass the params into `call` and use them later
-without affecting the API call (i.e. chain of responsiblity); a
+without affecting the API call (i.e. chain of responsibility); a
 nifty trick we use in (Rack)[http://github.com/rack/rack]
 
 Use
 ---
 
-    require 'rubygems' # if you're using rubygems
     require 'swirl/aws'
 
-    ec2 = Swirl::EC2.new
+    ec2 = Swirl::AWS.new(:ec2)
 
     # Describe all instances
     ec2.call "DescribeInstances"
@@ -65,6 +63,8 @@ Use
     # Describe specific instances
     ec2.call "DescribeInstances", "InstanceId" => ["i-38hdk2f", "i-93nndch"]
 
+    # Talk to a different region
+    ec2_asia = Swirl::AWS.new(:ec2, :region => 'ap-southeast-1')
 
 Shell
 ---
